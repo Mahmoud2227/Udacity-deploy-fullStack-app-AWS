@@ -46,24 +46,16 @@ jobs:
           name: API Build
           command: |
             npm run api:build
-  # deploy step will run only after manual approval
-  deploy:
-    docker:
-      - image: "cimg/base:stable"
-      # more setup needed for aws, node, elastic beanstalk
-    steps:
-      - node/install:
-          node-version: "14.15"
-      - eb/setup
-      - aws-cli/setup
-      - checkout
+      # Use root level package.json to Deploy the backend API
       - run:
-          name: Deploy App
-          # Install, build, deploy in both apps
+          name: API Deploy
           command: |
             npm run api:deploy
+      # Use root level package.json to Deploy the Frontend API
+      - run:
+          name: Frontend Deploy
+          command: |
             npm run frontend:deploy
-
 workflows:
   udagram:
     jobs:
@@ -76,6 +68,3 @@ workflows:
           type: approval
           requires:
             - build
-      - deploy:
-          requires:
-            - hold
